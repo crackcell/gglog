@@ -27,8 +27,10 @@ var m Logger
 
 func TestNewMulti(t *testing.T) {
 	m = NewMultiLogger(
-		NewLogger(os.Stdout, "log", LOGLEVEL_DEBUG|LOGLEVEL_INFO|LOGLEVEL_WARN|LOGLEVEL_FATAL),
-		NewLogger(os.Stderr, "log.wf", LOGLEVEL_WARN|LOGLEVEL_FATAL))
+		NewLogger(os.Stdout, "log", NewStandardFormatter(),
+			LOGLEVEL_DEBUG|LOGLEVEL_INFO|LOGLEVEL_WARN|LOGLEVEL_FATAL),
+		NewLogger(os.Stderr, "log.wf", NewStandardFormatter(),
+			LOGLEVEL_WARN|LOGLEVEL_FATAL))
 }
 
 func TestMultiDebug(t *testing.T) {

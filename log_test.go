@@ -26,7 +26,7 @@ import (
 var l Logger
 
 func TestNewLogger(t *testing.T) {
-	l = NewLogger(os.Stderr, "TestLogger", LOGLEVEL_DEBUG)
+	l = NewLogger(os.Stderr, "TestLogger", NewStandardFormatter(), LOGLEVEL_DEBUG)
 }
 
 func TestDebug(t *testing.T) {

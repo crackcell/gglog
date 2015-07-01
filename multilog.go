@@ -26,64 +26,66 @@ func NewMultiLogger(loggers ...Logger) Logger {
 	return &multiLogger{loggers}
 }
 
-func (self *multiLogger) Debug(v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) SetLogLevel(logLevelMask int) {}
+
+func (m *multiLogger) Debug(v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Debug(v...)
 		}
 	}
 }
 
-func (self *multiLogger) Debugf(format string, v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Debugf(format string, v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Debugf(format, v...)
 		}
 	}
 }
 
-func (self *multiLogger) Info(v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Info(v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Info(v...)
 		}
 	}
 }
 
-func (self *multiLogger) Infof(format string, v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Infof(format string, v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Infof(format, v...)
 		}
 	}
 }
 
-func (self *multiLogger) Warn(v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Warn(v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Warn(v...)
 		}
 	}
 }
 
-func (self *multiLogger) Warnf(format string, v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Warnf(format string, v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Warnf(format, v...)
 		}
 	}
 }
 
-func (self *multiLogger) Fatal(v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Fatal(v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Fatal(v...)
 		}
 	}
 }
 
-func (self *multiLogger) Fatalf(format string, v ...interface{}) {
-	for _, l := range self.loggers {
+func (m *multiLogger) Fatalf(format string, v ...interface{}) {
+	for _, l := range m.loggers {
 		if l != nil {
 			l.Fatalf(format, v...)
 		}

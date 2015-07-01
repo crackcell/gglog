@@ -38,6 +38,8 @@ const (
 )
 
 type Logger interface {
+	SetLogLevel(logLevelMask int)
+
 	Debug(v ...interface{})
 	Debugf(format string, v ...interface{})
 	Info(v ...interface{})
@@ -53,10 +55,14 @@ type logger struct {
 	loggers      map[int]*log.Logger
 	prefix       string
 	writer       io.Writer
+	format       Formatter
 }
 
-func NewLogger(writer io.Writer, prefix string, logLevelMask int) Logger {
+func NewLogger(writer io.Writer, prefix string, format Formatter,
+	mask int) Logger {
+
 	l := new(logger)
+	l.format = format
 	l.loggers = make(map[int]*log.Logger)
 	if writer == nil {
 		l.writer = &nullWriter{}
@@ -64,7 +70,7 @@ func NewLogger(writer io.Writer, prefix string, logLevelMask int) Logger {
 		l.writer = writer
 	}
 	l.prefix = prefix
-	l.SetLogLevel(logLevelMask)
+	l.SetLogLevel(mask)
 	return l
 }
 
@@ -72,59 +78,52 @@ func NewLogger(writer io.Writer, prefix string, logLevelMask int) Logger {
 // Private
 //===================================================================
 
-func (l *logger) Debug(v ...interface{}) {
-	l.loggers[LOGLEVEL_DEBUG].Print(v...)
-}
-
-func (l *logger) Debugf(format string, v ...interface{}) {
-	l.loggers[LOGLEVEL_DEBUG].Printf(format, v...)
-}
-
-func (l *logger) Info(v ...interface{}) {
-	l.loggers[LOGLEVEL_INFO].Print(v...)
-}
-
-func (l *logger) Infof(format string, v ...interface{}) {
-	l.loggers[LOGLEVEL_INFO].Printf(format, v...)
-}
-
-func (l *logger) Warn(v ...interface{}) {
-	l.loggers[LOGLEVEL_WARN].Print(v...)
-}
-
-func (l *logger) Warnf(format string, v ...interface{}) {
-	l.loggers[LOGLEVEL_WARN].Printf(format, v...)
-}
-
-func (l *logger) Fatal(v ...interface{}) {
-	l.loggers[LOGLEVEL_FATAL].Fatal(v...)
-}
-
-func (l *logger) Fatalf(format string, v ...interface{}) {
-	l.loggers[LOGLEVEL_FATAL].Fatalf(format, v...)
-}
-
-func (l *logger) SetLogLevel(logLevelMask int) {
-	l.logLevelMask = logLevelMask
+func (l *logger) SetLogLevel(mask int) {
+	l.logLevelMask = mask
 	nullwriter := &nullWriter{}
 	for i := 0; i < LOGLEVEL_COUNT; i++ {
 		m := int(math.Exp2(float64(i)))
-		if logLevelMask&m != 0 {
-			l.loggers[m] = log.New(l.writer, l.prefix+" "+logLevelToName[m]+" ", log.LstdFlags)
+		flag := log.LstdFlags
+		if mask&m != 0 {
+			l.loggers[m] = log.New(l.writer, l.format.GetPrefix(l.prefix, m),
+				flag)
 		} else {
-			l.loggers[m] = log.New(nullwriter, l.prefix+" "+logLevelToName[m]+" ", log.LstdFlags)
+			l.loggers[m] = log.New(nullwriter, l.format.GetPrefix(l.prefix, m),
+				flag)
 		}
 	}
 }
 
-var logLevelToName map[int]string
+func (l *logger) Debug(v ...interface{}) {
+	l.loggers[LOGLEVEL_DEBUG].Print(append([]interface{}{l.format.GetPreFormat()}, v...)...)
+}
 
-func init() {
-	logLevelToName = make(map[int]string)
-	logLevelToName[LOGLEVEL_DEBUG] = "DEBUG"
-	logLevelToName[LOGLEVEL_INFO] = "INFO"
-	logLevelToName[LOGLEVEL_WARN] = "WARN"
-	logLevelToName[LOGLEVEL_FATAL] = "FATAL"
+func (l *logger) Debugf(format string, v ...interface{}) {
+	l.loggers[LOGLEVEL_DEBUG].Printf(l.format.GetPreFormat()+format, v...)
+}
+
+func (l *logger) Info(v ...interface{}) {
+	l.loggers[LOGLEVEL_INFO].Print(append([]interface{}{l.format.GetPreFormat()}, v...)...)
+}
+
+func (l *logger) Infof(format string, v ...interface{}) {
+	l.loggers[LOGLEVEL_INFO].Printf(l.format.GetPreFormat()+format, v...)
+}
+
+func (l *logger) Warn(v ...interface{}) {
+	l.loggers[LOGLEVEL_WARN].Print(append([]interface{}{l.format.GetPreFormat()}, v...)...)
+}
+
+func (l *logger) Warnf(format string, v ...interface{}) {
+	l.loggers[LOGLEVEL_WARN].Printf(l.format.GetPreFormat()+format, v...)
+}
+
+func (l *logger) Fatal(v ...interface{}) {
+	l.loggers[LOGLEVEL_FATAL].Fatal(append([]interface{}{l.format.GetPreFormat()}, v...)...)
+}
+
+func (l *logger) Fatalf(format string, v ...interface{}) {
+	l.loggers[LOGLEVEL_FATAL].Fatalf(l.format.GetPreFormat()+format, v...)
 }
 
 type nullWriter struct{}
