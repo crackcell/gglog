@@ -22,13 +22,12 @@ import (
 	"testing"
 )
 
-var blog Logger
-
-func TestNewBaiduLogger(t *testing.T) {
-	blog = NewBaiduLogger("testmodule", "./", LOGLEVEL_ALL)
-}
-
 func TestBaiduLoggerAll(t *testing.T) {
+	blog, err := NewBaiduLogger("testmodule", "./baidulog", LOGLEVEL_ALL)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	blog.Debug("test debug")
 	blog.Debugf("test debug %d", 1)
 	blog.Info("test info")

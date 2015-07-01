@@ -20,7 +20,6 @@ package gglog
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 	"strings"
 )
@@ -29,12 +28,19 @@ import (
 // Public APIs
 //===================================================================
 
-func NewBaiduLogger(module string, path string, logLevelMask int) Logger {
+func NewBaiduLogger(module string, path string, logLevelMask int) (Logger, error) {
 	l := new(baiduLogger)
 	l.module = module
-	l.outlog = NewLogger(os.Stderr, "", NewBaiduFormatter(), logLevelMask)
-	l.errlog = NewLogger(os.Stderr, "", NewBaiduFormatter(), logLevelMask)
-	return l
+	var err error
+	l.outlog, err = NewFileLogger(path+".log", "", NewBaiduFormatter(), logLevelMask)
+	if err != nil {
+		return nil, err
+	}
+	l.errlog, err = NewFileLogger(path+".log.wf", "", NewBaiduFormatter(), logLevelMask)
+	if err != nil {
+		return nil, err
+	}
+	return l, nil
 }
 
 //===================================================================
