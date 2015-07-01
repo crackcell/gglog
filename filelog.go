@@ -30,10 +30,11 @@ func NewFileLogger(path string, prefix string, format Formatter,
 	mask int) (Logger, error) {
 
 	l := new(fileLogger)
-	//f, err := os.Open(path)
 	var f *os.File
 	var err error
-	f, err = os.OpenFile(path, os.O_APPEND, 0666)
+	if f, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
+		f, err = os.Create(path)
+	}
 	if err != nil {
 		return nil, err
 	}
