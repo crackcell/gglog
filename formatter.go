@@ -8,7 +8,7 @@
  **************************************************************/
 
 /**
- * Log format
+ * Log formatter
  *
  * @file format.go
  * @author Menglong TAN <tanmenglong@gmail.com>
@@ -19,7 +19,7 @@
 package gglog
 
 import (
-// "fmt"
+	"time"
 )
 
 //===================================================================
@@ -27,8 +27,8 @@ import (
 //===================================================================
 
 type Formatter interface {
-	GetPrefix(userPrefix string, level int) string
-	GetPreFormat() string
+	GetMessage(level int, v ...interface{}) []interface{}
+	GetFormat(level int, fmt string) string
 }
 
 type StandardFormatter struct {
@@ -45,12 +45,17 @@ func NewStandardFormatter() Formatter {
 	return f
 }
 
-func (f *StandardFormatter) GetPrefix(userPrefix string, level int) string {
-	return userPrefix + " " + f.logLevelToName[level] + " "
+func (f *StandardFormatter) GetMessage(level int, v ...interface{}) []interface{} {
+	return append(
+		[]interface{}{
+			f.logLevelToName[level], " ",
+			time.Now().Format("2006-01-02 15:04:05"), " "}, v...)
 }
 
-func (f *StandardFormatter) GetPreFormat() string {
-	return ""
+func (f *StandardFormatter) GetFormat(level int, fmt string) string {
+	return f.logLevelToName[level] + " " +
+		time.Now().Format("2006-01-02 15:04:05") + " " +
+		fmt
 }
 
 //===================================================================

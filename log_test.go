@@ -23,30 +23,14 @@ import (
 	"testing"
 )
 
-var l Logger
-
-func TestNewLogger(t *testing.T) {
-	l = NewLogger(os.Stderr, "TestLogger", NewStandardFormatter(), LOGLEVEL_DEBUG)
-}
-
-func TestDebug(t *testing.T) {
+func TestLoggerAll(t *testing.T) {
+	l := NewLogger(os.Stderr, "TestLogger", NewStandardFormatter(), LOGLEVEL_ALL)
 	l.Debug("test debug")
 	l.Debugf("test debug %d", 1)
-}
-
-func TestInfo(t *testing.T) {
 	l.Info("test info")
 	l.Infof("test info %d", 1)
-}
-
-func TestWarn(t *testing.T) {
 	l.Warn("test warn")
 	l.Warnf("test warn %d", 1)
-}
-
-/*
-func TestFatal(t *testing.T) {
 	l.Fatal("test fatal")
 	l.Fatalf("test fatal %d", 1)
 }
-*/

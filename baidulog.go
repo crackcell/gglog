@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"time"
 )
 
 //===================================================================
@@ -60,38 +61,38 @@ func (l *baiduLogger) SetLogLevel(mask int) {
 
 func (l *baiduLogger) Debug(v ...interface{}) {
 	l.outlog.Debug(append(
-		[]interface{}{l.module, ": ", getCallerInfo(), " "}, v...)...)
+		[]interface{}{l.module, " * ", getCallerInfo(), " "}, v...)...)
 }
 
 func (l *baiduLogger) Debugf(format string, v ...interface{}) {
-	l.outlog.Debugf(l.module+": "+getCallerInfo()+" "+format, v...)
+	l.outlog.Debugf(l.module+" * "+getCallerInfo()+" "+format, v...)
 }
 
 func (l *baiduLogger) Info(v ...interface{}) {
 	l.outlog.Info(append(
-		[]interface{}{l.module, ": "}, v...)...)
+		[]interface{}{l.module, " * "}, v...)...)
 }
 
 func (l *baiduLogger) Infof(format string, v ...interface{}) {
-	l.outlog.Infof(l.module+": "+format, v...)
+	l.outlog.Infof(l.module+" * "+format, v...)
 }
 
 func (l *baiduLogger) Warn(v ...interface{}) {
 	l.errlog.Warn(append(
-		[]interface{}{l.module, ": ", getCallerInfo(), " "}, v...)...)
+		[]interface{}{l.module, " * ", getCallerInfo(), " "}, v...)...)
 }
 
 func (l *baiduLogger) Warnf(format string, v ...interface{}) {
-	l.errlog.Warnf(l.module+": "+getCallerInfo()+" "+format, v...)
+	l.errlog.Warnf(l.module+" * "+getCallerInfo()+" "+format, v...)
 }
 
 func (l *baiduLogger) Fatal(v ...interface{}) {
 	l.errlog.Fatal(append(
-		[]interface{}{l.module, ": ", getCallerInfo(), " "}, v...)...)
+		[]interface{}{l.module, " * ", getCallerInfo(), " "}, v...)...)
 }
 
 func (l *baiduLogger) Fatalf(format string, v ...interface{}) {
-	l.errlog.Fatalf(l.module+": "+getCallerInfo()+" "+format, v...)
+	l.errlog.Fatalf(l.module+" * "+getCallerInfo()+" "+format, v...)
 }
 
 type BaiduFormatter struct {
@@ -108,12 +109,17 @@ func NewBaiduFormatter() Formatter {
 	return f
 }
 
-func (f *BaiduFormatter) GetPrefix(userPrefix string, level int) string {
-	return f.logLevelToName[level] + " "
+func (f *BaiduFormatter) GetMessage(level int, v ...interface{}) []interface{} {
+	return append(
+		[]interface{}{
+			f.logLevelToName[level], ": ",
+			time.Now().Format("2006-01-02 15:04:05:"), " "}, v...)
 }
 
-func (f *BaiduFormatter) GetPreFormat() string {
-	return ""
+func (f *BaiduFormatter) GetFormat(level int, fmt string) string {
+	return f.logLevelToName[level] + ": " +
+		time.Now().Format("2006-01-02 15:04:05:") + " " +
+		fmt
 }
 
 func getCallerInfo() string {
