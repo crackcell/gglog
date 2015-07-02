@@ -29,7 +29,7 @@ import (
 func NewFileLogger(path string, prefix string, format Formatter,
 	mask int) (Logger, error) {
 
-	l := new(FileLogger)
+	l := new(fileLogger)
 	var err error
 	if l.file, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
 		l.file, err = os.Create(path)
@@ -45,43 +45,43 @@ func NewFileLogger(path string, prefix string, format Formatter,
 // Private
 //===================================================================
 
-type FileLogger struct {
+type fileLogger struct {
 	file *os.File
 	log  Logger
 }
 
-func (l *FileLogger) SetLogLevel(mask int) {
+func (l *fileLogger) SetLogLevel(mask int) {
 	l.log.SetLogLevel(mask)
 }
 
-func (l *FileLogger) Debug(v ...interface{}) {
+func (l *fileLogger) Debug(v ...interface{}) {
 	l.log.Debug(v...)
 }
 
-func (l *FileLogger) Debugf(format string, v ...interface{}) {
+func (l *fileLogger) Debugf(format string, v ...interface{}) {
 	l.log.Debugf(format, v...)
 }
 
-func (l *FileLogger) Info(v ...interface{}) {
+func (l *fileLogger) Info(v ...interface{}) {
 	l.log.Info(v...)
 }
 
-func (l *FileLogger) Infof(format string, v ...interface{}) {
+func (l *fileLogger) Infof(format string, v ...interface{}) {
 	l.log.Infof(format, v...)
 }
 
-func (l *FileLogger) Warn(v ...interface{}) {
+func (l *fileLogger) Warn(v ...interface{}) {
 	l.log.Warn(v...)
 }
 
-func (l *FileLogger) Warnf(format string, v ...interface{}) {
+func (l *fileLogger) Warnf(format string, v ...interface{}) {
 	l.log.Warnf(format, v...)
 }
 
-func (l *FileLogger) Fatal(v ...interface{}) {
+func (l *fileLogger) Fatal(v ...interface{}) {
 	l.log.Fatal(v...)
 }
 
-func (l *FileLogger) Fatalf(format string, v ...interface{}) {
+func (l *fileLogger) Fatalf(format string, v ...interface{}) {
 	l.log.Fatalf(format, v...)
 }
