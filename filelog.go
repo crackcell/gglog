@@ -30,16 +30,19 @@ func NewFileLogger(path string, prefix string, format Formatter,
 	mask int) (Logger, error) {
 
 	l := new(fileLogger)
-	var f *os.File
 	var err error
-	if f, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
-		f, err = os.Create(path)
+	if l.file, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
+		l.file, err = os.Create(path)
 	}
 	if err != nil {
 		return nil, err
 	}
-	l.log = NewLogger(f, prefix, format, mask)
+	l.log = NewLogger(l.file, prefix, format, mask)
 	return l, nil
+}
+
+func (f *fileLogger) Close() error {
+	return f.file.Close()
 }
 
 //===================================================================
@@ -47,7 +50,8 @@ func NewFileLogger(path string, prefix string, format Formatter,
 //===================================================================
 
 type fileLogger struct {
-	log Logger
+	file *os.File
+	log  Logger
 }
 
 func (l *fileLogger) SetLogLevel(mask int) {
