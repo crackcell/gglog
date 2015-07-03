@@ -19,6 +19,7 @@
 package gglog
 
 import (
+	"fmt"
 	"io"
 	stdlog "log"
 	"os"
@@ -83,45 +84,39 @@ func (l *logger) SetLogLevel(mask int) {
 }
 
 func (l *logger) Debug(v ...interface{}) {
-	l.writelog(LOGLEVEL_DEBUG, v...)
+	l.output(LOGLEVEL_DEBUG, fmt.Sprint(v...))
 }
 
-func (l *logger) Debugf(fmt string, v ...interface{}) {
-	l.writelogf(LOGLEVEL_DEBUG, fmt, v...)
+func (l *logger) Debugf(format string, v ...interface{}) {
+	l.output(LOGLEVEL_DEBUG, fmt.Sprintf(format, v...))
 }
 
 func (l *logger) Info(v ...interface{}) {
-	l.writelog(LOGLEVEL_INFO, v...)
+	l.output(LOGLEVEL_INFO, fmt.Sprint(v...))
 }
 
-func (l *logger) Infof(fmt string, v ...interface{}) {
-	l.writelogf(LOGLEVEL_INFO, fmt, v...)
+func (l *logger) Infof(format string, v ...interface{}) {
+	l.output(LOGLEVEL_INFO, fmt.Sprintf(format, v...))
 }
 
 func (l *logger) Warn(v ...interface{}) {
-	l.writelog(LOGLEVEL_WARN, v...)
+	l.output(LOGLEVEL_WARN, fmt.Sprint(v...))
 }
 
-func (l *logger) Warnf(fmt string, v ...interface{}) {
-	l.writelogf(LOGLEVEL_WARN, fmt, v...)
+func (l *logger) Warnf(format string, v ...interface{}) {
+	l.output(LOGLEVEL_WARN, fmt.Sprintf(format, v...))
 }
 
 func (l *logger) Fatal(v ...interface{}) {
-	l.writelog(LOGLEVEL_FATAL, v...)
+	l.output(LOGLEVEL_FATAL, fmt.Sprint(v...))
 }
 
-func (l *logger) Fatalf(fmt string, v ...interface{}) {
-	l.writelogf(LOGLEVEL_FATAL, fmt, v...)
+func (l *logger) Fatalf(format string, v ...interface{}) {
+	l.output(LOGLEVEL_FATAL, fmt.Sprintf(format, v...))
 }
 
-func (l *logger) writelog(level int, v ...interface{}) {
+func (l *logger) output(level int, s string) {
 	if l.logLevelMask&level != 0 {
-		l.log.Print(l.formatter.GetMessage(level, v...)...)
-	}
-}
-
-func (l *logger) writelogf(level int, fmt string, v ...interface{}) {
-	if l.logLevelMask&level != 0 {
-		l.log.Printf(l.formatter.GetFormat(level, fmt), v...)
+		l.log.Print(l.formatter.GetHeader(level) + s)
 	}
 }

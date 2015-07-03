@@ -27,8 +27,7 @@ import (
 //===================================================================
 
 type Formatter interface {
-	GetMessage(level int, v ...interface{}) []interface{}
-	GetFormat(level int, fmt string) string
+	GetHeader(level int) string
 }
 
 type StandardFormatter struct {
@@ -45,17 +44,9 @@ func NewStandardFormatter() Formatter {
 	return f
 }
 
-func (f *StandardFormatter) GetMessage(level int, v ...interface{}) []interface{} {
-	return append(
-		[]interface{}{
-			f.logLevelToName[level], " ",
-			time.Now().Format("2006-01-02 15:04:05"), " "}, v...)
-}
-
-func (f *StandardFormatter) GetFormat(level int, fmt string) string {
+func (f *StandardFormatter) GetHeader(level int) string {
 	return f.logLevelToName[level] + " " +
-		time.Now().Format("2006-01-02 15:04:05") + " " +
-		fmt
+		time.Now().Format("2006-01-02 15:04:05") + " "
 }
 
 //===================================================================

@@ -20,6 +20,7 @@ package gglog
 
 import (
 	"os"
+	"sync"
 )
 
 //===================================================================
@@ -30,6 +31,7 @@ func NewFileLogger(path string, prefix string, format Formatter,
 	mask int) (Logger, error) {
 
 	l := new(fileLogger)
+	l.mu = new(sync.Mutex)
 	var err error
 	if l.file, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
 		l.file, err = os.Create(path)
@@ -46,42 +48,76 @@ func NewFileLogger(path string, prefix string, format Formatter,
 //===================================================================
 
 type fileLogger struct {
+	mu   *sync.Mutex
+	path string
 	file *os.File
 	log  Logger
 }
 
+func (l *fileLogger) GetPath() string {
+	return l.path
+}
+
+func (l *fileLogger) Close() error {
+	return l.file.Close()
+}
+
+func (l *fileLogger) Rename(newPath string) error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return os.Rename(l.path, newPath)
+}
+
 func (l *fileLogger) SetLogLevel(mask int) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.SetLogLevel(mask)
 }
 
 func (l *fileLogger) Debug(v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Debug(v...)
 }
 
 func (l *fileLogger) Debugf(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Debugf(format, v...)
 }
 
 func (l *fileLogger) Info(v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Info(v...)
 }
 
 func (l *fileLogger) Infof(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Infof(format, v...)
 }
 
 func (l *fileLogger) Warn(v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Warn(v...)
 }
 
 func (l *fileLogger) Warnf(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Warnf(format, v...)
 }
 
 func (l *fileLogger) Fatal(v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Fatal(v...)
 }
 
 func (l *fileLogger) Fatalf(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.log.Fatalf(format, v...)
 }

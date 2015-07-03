@@ -109,17 +109,9 @@ func NewBaiduFormatter() Formatter {
 	return f
 }
 
-func (f *BaiduFormatter) GetMessage(level int, v ...interface{}) []interface{} {
-	return append(
-		[]interface{}{
-			f.logLevelToName[level], ": ",
-			time.Now().Format("2006-01-02 15:04:05:"), " "}, v...)
-}
-
-func (f *BaiduFormatter) GetFormat(level int, fmt string) string {
+func (f *BaiduFormatter) GetHeader(level int) string {
 	return f.logLevelToName[level] + ": " +
-		time.Now().Format("2006-01-02 15:04:05:") + " " +
-		fmt
+		time.Now().Format("2006-01-02 15:04:05") + ": "
 }
 
 func getCallerInfo() string {
