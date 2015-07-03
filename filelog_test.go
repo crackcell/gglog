@@ -19,20 +19,30 @@
 package gglog
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestFileLoggerALl(t *testing.T) {
-	fl, err := NewFileLogger("./file.log", "filelog", NewStandardFormatter(),
+	f, err := NewFileLogger("./file.log", "filelog", NewStandardFormatter(),
 		LOGLEVEL_ALL)
 	if err != nil {
 		t.Error(err)
 		return
 	}
+	fl := f.(*FileLogger)
 	fl.Debug("test debug")
 	fl.Debugf("test debug %d", 1)
 	fl.Info("test info")
 	fl.Infof("test info %d", 1)
 	fl.Warn("test warn")
 	fl.Warnf("test warn %d", 1)
+
+	fmt.Println("---------------->>>>>>")
+	err = fl.Rename("./file.rename.log")
+	if err != nil {
+		t.Error(err)
+	}
+
+	fl.Warn("file changed")
 }

@@ -19,6 +19,7 @@
 package gglog
 
 import (
+	"fmt"
 	"os"
 	"sync"
 )
@@ -27,19 +28,20 @@ import (
 // Public APIs
 //===================================================================
 
-func NewFileLogger(path string, prefix string, format Formatter,
+func NewFileLogger(path string, prefix string, formatter Formatter,
 	mask int) (Logger, error) {
 
-	l := new(fileLogger)
+	l := new(FileLogger)
 	l.mu = new(sync.Mutex)
 	var err error
-	if l.file, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
-		l.file, err = os.Create(path)
-	}
+	l.file, err = l.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	l.log = NewLogger(l.file, prefix, format, mask)
+	l.log = NewLogger(l.file, prefix, formatter, mask)
+	l.prefix = prefix
+	l.formatter = formatter
+	l.mask = mask
 	return l, nil
 }
 
@@ -47,76 +49,112 @@ func NewFileLogger(path string, prefix string, format Formatter,
 // Private
 //===================================================================
 
-type fileLogger struct {
-	mu   *sync.Mutex
-	path string
-	file *os.File
-	log  Logger
+type FileLogger struct {
+	mu        *sync.Mutex
+	file      *os.File
+	prefix    string
+	formatter Formatter
+	mask      int
+	path      string
+	log       Logger
 }
 
-func (l *fileLogger) GetPath() string {
+func (l *FileLogger) Open(path string) (*os.File, error) {
+	var f *os.File
+	var err error
+	if f, err = os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666); os.IsNotExist(err) {
+		f, err = os.Create(path)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func (l *FileLogger) GetPath() string {
 	return l.path
 }
 
-func (l *fileLogger) Close() error {
+func (l *FileLogger) Close() error {
 	return l.file.Close()
 }
 
-func (l *fileLogger) Rename(newPath string) error {
+func (l *FileLogger) Rename(newPath string) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	return os.Rename(l.path, newPath)
+
+	var err error
+
+	err = l.Close()
+	if err != nil {
+		return err
+	}
+
+	err = os.Rename(l.path, newPath)
+	if err != nil {
+		return err
+	}
+	fmt.Println(l.path + "-->" + newPath)
+
+	l.file, err = l.Open(newPath)
+	if err != nil {
+		return err
+	}
+
+	l.log = NewLogger(l.file, l.prefix, l.formatter, l.mask)
+	l.path = newPath
+	return nil
 }
 
-func (l *fileLogger) SetLogLevel(mask int) {
+func (l *FileLogger) SetLogLevel(mask int) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.SetLogLevel(mask)
 }
 
-func (l *fileLogger) Debug(v ...interface{}) {
+func (l *FileLogger) Debug(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Debug(v...)
 }
 
-func (l *fileLogger) Debugf(format string, v ...interface{}) {
+func (l *FileLogger) Debugf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Debugf(format, v...)
 }
 
-func (l *fileLogger) Info(v ...interface{}) {
+func (l *FileLogger) Info(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Info(v...)
 }
 
-func (l *fileLogger) Infof(format string, v ...interface{}) {
+func (l *FileLogger) Infof(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Infof(format, v...)
 }
 
-func (l *fileLogger) Warn(v ...interface{}) {
+func (l *FileLogger) Warn(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Warn(v...)
 }
 
-func (l *fileLogger) Warnf(format string, v ...interface{}) {
+func (l *FileLogger) Warnf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Warnf(format, v...)
 }
 
-func (l *fileLogger) Fatal(v ...interface{}) {
+func (l *FileLogger) Fatal(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Fatal(v...)
 }
 
-func (l *fileLogger) Fatalf(format string, v ...interface{}) {
+func (l *FileLogger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.log.Fatalf(format, v...)
