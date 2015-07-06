@@ -19,7 +19,6 @@
 package gglog
 
 import (
-	"fmt"
 	"os"
 	"sync"
 )
@@ -68,6 +67,7 @@ func (l *FileLogger) Open(path string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
+	l.path = path
 	return f, nil
 }
 
@@ -94,7 +94,6 @@ func (l *FileLogger) Rename(newPath string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(l.path + "-->" + newPath)
 
 	l.file, err = l.Open(newPath)
 	if err != nil {

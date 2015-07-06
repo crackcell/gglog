@@ -19,7 +19,6 @@
 package gglog
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -38,7 +37,6 @@ func TestFileLoggerALl(t *testing.T) {
 	fl.Warn("test warn")
 	fl.Warnf("test warn %d", 1)
 
-	fmt.Println("---------------->>>>>>")
 	err = fl.Rename("./file.rename.log")
 	if err != nil {
 		t.Error(err)
