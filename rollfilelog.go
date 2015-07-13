@@ -18,32 +18,20 @@
 
 package gglog
 
-import (
-	"os"
-	"sync"
-)
+import ()
 
 //===================================================================
 // Public APIs
 //===================================================================
 
-type FileWithLock struct {
-	file *os.File
-}
-
-type FileQueue struct {
-}
-
-type LogRoller interface {
-	Roll() error
-}
-
-func NewRollFileLogger(path string, prefix string, format Formatter,
+func NewRollFileLogger(path string, prefix string, formatter Formatter,
 	mask int) (Logger, error) {
-
-	l := new(rollFileLogger)
-	l.mu = new(sync.Mutex)
-
+	l := new(RollFileLogger)
+	if fl, err := NewFileLogger(path, prefix, formatter, mask); err != nil {
+		return nil, err
+	} else {
+		l.loggers = []*FileLogger{fl}
+	}
 	return l, nil
 }
 
@@ -51,50 +39,33 @@ func NewRollFileLogger(path string, prefix string, format Formatter,
 // Private
 //===================================================================
 
-type rollFileLogger struct {
-	mu    *sync.Mutex
-	files []*os.File
+type RollFileLogger struct {
+	loggers []*FileLogger
 }
 
-func (l *rollFileLogger) SetLogLevel(mask int) {
+func (l *RollFileLogger) SetLogLevel(mask int) {
 }
 
-func (l *rollFileLogger) Debug(v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Debug(v ...interface{}) {
 }
 
-func (l *rollFileLogger) Debugf(fmt string, v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Debugf(fmt string, v ...interface{}) {
 }
 
-func (l *rollFileLogger) Info(v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Info(v ...interface{}) {
 }
 
-func (l *rollFileLogger) Infof(fmt string, v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Infof(fmt string, v ...interface{}) {
 }
 
-func (l *rollFileLogger) Warn(v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Warn(v ...interface{}) {
 }
 
-func (l *rollFileLogger) Warnf(fmt string, v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Warnf(fmt string, v ...interface{}) {
 }
 
-func (l *rollFileLogger) Fatal(v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Fatal(v ...interface{}) {
 }
 
-func (l *rollFileLogger) Fatalf(fmt string, v ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *RollFileLogger) Fatalf(fmt string, v ...interface{}) {
 }

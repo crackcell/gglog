@@ -28,7 +28,7 @@ import (
 //===================================================================
 
 func NewFileLogger(path string, prefix string, formatter Formatter,
-	mask int) (Logger, error) {
+	mask int) (*FileLogger, error) {
 
 	l := new(FileLogger)
 	l.mu = new(sync.Mutex)

@@ -23,13 +23,13 @@ import (
 )
 
 func TestFileLoggerALl(t *testing.T) {
-	f, err := NewFileLogger("./file.log", "filelog", NewStandardFormatter(),
+	fl, err := NewFileLogger("./file.log", "filelog", NewStandardFormatter(),
 		LOGLEVEL_ALL)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	fl := f.(*FileLogger)
+	//fl := f.(*fileLogger)
 	fl.Debug("test debug")
 	fl.Debugf("test debug %d", 1)
 	fl.Info("test info")

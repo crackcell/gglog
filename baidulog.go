@@ -50,8 +50,8 @@ func NewBaiduLogger(module string, path string, logLevelMask int) (Logger, error
 
 type baiduLogger struct {
 	module string
-	outlog Logger
-	errlog Logger
+	outlog *FileLogger
+	errlog *FileLogger
 }
 
 func (l *baiduLogger) SetLogLevel(mask int) {
