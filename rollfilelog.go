@@ -95,6 +95,7 @@ func (l *RollFileLogger) Fatalf(format string, v ...interface{}) {
 }
 
 func (l *RollFileLogger) Output(level int, s string) {
+	l.size += len(s)
 	if l.mask&level != 0 {
 		l.loggers[0].Output(level, s)
 	}
