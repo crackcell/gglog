@@ -39,14 +39,14 @@ func NewStandardFormatter() Formatter {
 	f.logLevelToName = make(map[int]string)
 	f.logLevelToName[LOGLEVEL_DEBUG] = "DEBUG"
 	f.logLevelToName[LOGLEVEL_INFO] = "INFO"
-	f.logLevelToName[LOGLEVEL_WARN] = "WARNING"
+	f.logLevelToName[LOGLEVEL_WARN] = "WARN"
 	f.logLevelToName[LOGLEVEL_FATAL] = "FATAL"
 	return f
 }
 
 func (f *StandardFormatter) GetHeader(level int) string {
-	return f.logLevelToName[level] + " " +
-		time.Now().Format("2006-01-02 15:04:05") + " "
+	return time.Now().Format("2006-01-02 15:04:05") + " " +
+		f.logLevelToName[level] + " "
 }
 
 //===================================================================
