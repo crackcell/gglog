@@ -60,39 +60,48 @@ func (l *baiduLogger) SetLogLevel(mask int) {
 }
 
 func (l *baiduLogger) Debug(v ...interface{}) {
-	l.outlog.Debug(append(
-		[]interface{}{l.module, " * ", getCallerInfo(), " "}, v...)...)
+	l.Output(LOGLEVEL_DEBUG, fmt.Sprint(v...))
 }
 
 func (l *baiduLogger) Debugf(format string, v ...interface{}) {
-	l.outlog.Debugf(l.module+" * "+getCallerInfo()+" "+format, v...)
+	l.Output(LOGLEVEL_DEBUG, fmt.Sprintf(format, v...))
 }
 
 func (l *baiduLogger) Info(v ...interface{}) {
-	l.outlog.Info(append(
-		[]interface{}{l.module, " * "}, v...)...)
+	l.Output(LOGLEVEL_INFO, fmt.Sprint(v...))
 }
 
 func (l *baiduLogger) Infof(format string, v ...interface{}) {
-	l.outlog.Infof(l.module+" * "+format, v...)
+	l.Output(LOGLEVEL_INFO, fmt.Sprintf(format, v...))
 }
 
 func (l *baiduLogger) Warn(v ...interface{}) {
-	l.errlog.Warn(append(
-		[]interface{}{l.module, " * ", getCallerInfo(), " "}, v...)...)
+	l.Output(LOGLEVEL_WARN, fmt.Sprint(v...))
 }
 
 func (l *baiduLogger) Warnf(format string, v ...interface{}) {
-	l.errlog.Warnf(l.module+" * "+getCallerInfo()+" "+format, v...)
+	l.Output(LOGLEVEL_WARN, fmt.Sprintf(format, v...))
 }
 
 func (l *baiduLogger) Fatal(v ...interface{}) {
-	l.errlog.Fatal(append(
-		[]interface{}{l.module, " * ", getCallerInfo(), " "}, v...)...)
+	l.Output(LOGLEVEL_FATAL, fmt.Sprint(v...))
 }
 
 func (l *baiduLogger) Fatalf(format string, v ...interface{}) {
-	l.errlog.Fatalf(l.module+" * "+getCallerInfo()+" "+format, v...)
+	l.Output(LOGLEVEL_FATAL, fmt.Sprintf(format, v...))
+}
+
+func (l *baiduLogger) Output(level int, s string) {
+	switch level {
+	case LOGLEVEL_FATAL:
+		l.errlog.Fatal(s)
+	case LOGLEVEL_WARN:
+		l.errlog.Warn(s)
+	case LOGLEVEL_INFO:
+		l.outlog.Info(s)
+	case LOGLEVEL_DEBUG:
+		l.outlog.Debug(s)
+	}
 }
 
 type BaiduFormatter struct {

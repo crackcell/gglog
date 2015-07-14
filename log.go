@@ -49,6 +49,7 @@ type Logger interface {
 	Warnf(format string, v ...interface{})
 	Fatal(v ...interface{})
 	Fatalf(format string, v ...interface{})
+	Output(level int, str string)
 }
 
 type logger struct {
@@ -84,39 +85,50 @@ func (l *logger) SetLogLevel(mask int) {
 }
 
 func (l *logger) Debug(v ...interface{}) {
-	l.output(LOGLEVEL_DEBUG, fmt.Sprint(v...))
+	l.Output(LOGLEVEL_DEBUG, fmt.Sprint(v...))
 }
 
 func (l *logger) Debugf(format string, v ...interface{}) {
-	l.output(LOGLEVEL_DEBUG, fmt.Sprintf(format, v...))
+	l.Output(LOGLEVEL_DEBUG, fmt.Sprintf(format, v...))
 }
 
 func (l *logger) Info(v ...interface{}) {
-	l.output(LOGLEVEL_INFO, fmt.Sprint(v...))
+	l.Output(LOGLEVEL_INFO, fmt.Sprint(v...))
 }
 
 func (l *logger) Infof(format string, v ...interface{}) {
-	l.output(LOGLEVEL_INFO, fmt.Sprintf(format, v...))
+	l.Output(LOGLEVEL_INFO, fmt.Sprintf(format, v...))
 }
 
 func (l *logger) Warn(v ...interface{}) {
-	l.output(LOGLEVEL_WARN, fmt.Sprint(v...))
+	l.Output(LOGLEVEL_WARN, fmt.Sprint(v...))
 }
 
 func (l *logger) Warnf(format string, v ...interface{}) {
-	l.output(LOGLEVEL_WARN, fmt.Sprintf(format, v...))
+	l.Output(LOGLEVEL_WARN, fmt.Sprintf(format, v...))
 }
 
 func (l *logger) Fatal(v ...interface{}) {
-	l.output(LOGLEVEL_FATAL, fmt.Sprint(v...))
+	l.Output(LOGLEVEL_FATAL, fmt.Sprint(v...))
 }
 
 func (l *logger) Fatalf(format string, v ...interface{}) {
-	l.output(LOGLEVEL_FATAL, fmt.Sprintf(format, v...))
+	l.Output(LOGLEVEL_FATAL, fmt.Sprintf(format, v...))
 }
 
-func (l *logger) output(level int, s string) {
-	if l.logLevelMask&level != 0 {
-		l.log.Print(l.formatter.GetHeader(level) + s)
+func (l *logger) Output(level int, s string) {
+	if l.logLevelMask&level == 0 {
+		return
+	}
+	s = l.formatter.GetHeader(level) + s
+	switch level {
+	case LOGLEVEL_FATAL:
+		l.log.Print(s)
+	case LOGLEVEL_WARN:
+		l.log.Print(s)
+	case LOGLEVEL_INFO:
+		l.log.Print(s)
+	case LOGLEVEL_DEBUG:
+		l.log.Print(s)
 	}
 }

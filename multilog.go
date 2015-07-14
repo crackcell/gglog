@@ -92,6 +92,14 @@ func (m *multiLogger) Fatalf(format string, v ...interface{}) {
 	}
 }
 
+func (m *multiLogger) Output(level int, s string) {
+	for _, l := range m.loggers {
+		if l != nil {
+			l.Output(level, s)
+		}
+	}
+}
+
 //===================================================================
 // Private
 //===================================================================

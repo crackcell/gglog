@@ -25,6 +25,7 @@ import (
 func TestRollFileLoggerAll(t *testing.T) {
 	l, err := NewRollFileLogger("./rollfile.log", "TestRollFileLog",
 		NewStandardFormatter(), LOGLEVEL_ALL)
+	l.SetRollSize(1 * KB)
 	if err != nil {
 		t.Error(err)
 		return

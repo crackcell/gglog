@@ -19,6 +19,7 @@
 package gglog
 
 import (
+	"fmt"
 	"os"
 	"sync"
 )
@@ -114,47 +115,53 @@ func (l *FileLogger) SetLogLevel(mask int) {
 func (l *FileLogger) Debug(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Debug(v...)
+	l.log.Output(LOGLEVEL_DEBUG, fmt.Sprint(v...))
 }
 
 func (l *FileLogger) Debugf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Debugf(format, v...)
+	l.log.Output(LOGLEVEL_DEBUG, fmt.Sprintf(format, v...))
 }
 
 func (l *FileLogger) Info(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Info(v...)
+	l.log.Output(LOGLEVEL_INFO, fmt.Sprint(v...))
 }
 
 func (l *FileLogger) Infof(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Infof(format, v...)
+	l.log.Output(LOGLEVEL_INFO, fmt.Sprintf(format, v...))
 }
 
 func (l *FileLogger) Warn(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Warn(v...)
+	l.log.Output(LOGLEVEL_WARN, fmt.Sprint(v...))
 }
 
 func (l *FileLogger) Warnf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Warnf(format, v...)
+	l.log.Output(LOGLEVEL_WARN, fmt.Sprintf(format, v...))
 }
 
 func (l *FileLogger) Fatal(v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Fatal(v...)
+	l.log.Output(LOGLEVEL_FATAL, fmt.Sprint(v...))
 }
 
 func (l *FileLogger) Fatalf(format string, v ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.log.Fatalf(format, v...)
+	l.log.Output(LOGLEVEL_FATAL, fmt.Sprintf(format, v...))
+}
+
+func (l *FileLogger) Output(level int, s string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.log.Output(level, s)
 }
